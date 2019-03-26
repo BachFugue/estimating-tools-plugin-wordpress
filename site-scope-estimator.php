@@ -127,9 +127,7 @@ function display_post_types(){
 	}
 	
 	echo '<tr>';
-	echo '<td>';
-	echo '</td>';
-	echo '<td>';
+	echo '<td colspan="2">';
 	echo 'TOTALS';
 	echo '</td>';
 	echo '<td>';
@@ -145,20 +143,62 @@ function display_post_types(){
 }
 
 function display_taxonomies(){
-	$cust_args = array(
+
+	// built-in taxonomy
+	$builtin_args = array(
 	  'public'   => true,
-	  '_builtin' => false
+	  '_builtin' => true
 	  
 	); 
 	$output = 'names'; // or objects
 	$operator = 'and'; // 'and' or 'or'
-	$taxonomies = get_taxonomies( $cust_args, $output, $operator ); 
+	$taxonomies = get_taxonomies( $builtin_args, $output, $operator ); 
 	if ( $taxonomies ) {
-	  foreach ( $taxonomies  as $taxonomy ) {
-	    echo '<p>' . $taxonomy . '</p>';
-	  }
+		
+		foreach ( $taxonomies  as $taxonomy ) {
+		    echo '<h2>' . ucfirst ($taxonomy) . '</h2>';		
+			$cat_args = array(
+			    'taxonomy' => $taxonomy,
+			    'hide_empty' => true,
+			);
+			$terms = get_terms($cat_args);
+			if( $terms ){
+			    echo '<table id="scope">';
+			    echo '<tr>';
+			    echo '<th>';
+			    echo 'Name';
+			    echo '</th>';
+			    echo '<th>';
+			    echo 'Tax Type';
+			    echo '</th>';
+				echo '</tr>';			
+			    //display all the top-level categories first
+			    foreach ($terms as $term) {
+			        if( !$term->parent ){
+			            echo '<tr>';
+			            echo '<td>';
+			            echo '<a href="' . esc_url( get_term_link( $term->term_id ) ) . '" title="' . esc_attr( sprintf( __( "View all posts in %s" ), $term->name ) ) . '" >' . $term->name.'</a>';
+			            echo '</td>';
+			            echo '<td>';
+			            echo $term->taxonomy;
+			            echo '</td>';
+			            echo '<tr>';
+			        }
+			    }
+			
+			    //now, display all the child categories
+			    foreach ($terms as $term) {
+			        if( $term->parent ){
+			            $output .= '<a href="' . esc_url( get_term_link( $term->term_id ) ) . '" title="' . esc_attr( sprintf( __( "View all posts in %s" ), $term->name ) ) . '" >' . $term->name.'</a>,';
+			        }
+			    }
+			
+			    echo '</table>';
+			}
+		}
 	}
 	
+	//custom taxonomy
 	$builtin_args = array(
 	  'public'   => true,
 	  '_builtin' => false
@@ -168,46 +208,60 @@ function display_taxonomies(){
 	$operator = 'and'; // 'and' or 'or'
 	$taxonomies = get_taxonomies( $builtin_args, $output, $operator ); 
 	if ( $taxonomies ) {
-	  foreach ( $taxonomies  as $taxonomy ) {
-	    echo '<p>' . $taxonomy . '</p>';
-	  }
+		
+		foreach ( $taxonomies  as $taxonomy ) {
+		    echo '<h2>' . ucfirst ($taxonomy) . '</h2>';		
+			$cat_args = array(
+			    'taxonomy' => $taxonomy,
+			    'hide_empty' => true,
+			);
+			$terms = get_terms($cat_args);
+			if( $terms ){
+			    echo '<table id="scope">';
+			    echo '<tr>';
+			    echo '<th>';
+			    echo 'Name';
+			    echo '</th>';
+			    echo '<th>';
+			    echo 'Tax Type';
+			    echo '</th>';
+				echo '</tr>';
+			
+			    //display all the top-level categories first
+			    foreach ($terms as $term) {
+			        if( !$term->parent ){
+			            echo '<tr>';
+			            echo '<td>';
+			            echo '<a href="' . esc_url( get_term_link( $term->term_id ) ) . '" title="' . esc_attr( sprintf( __( "View all posts in %s" ), $term->name ) ) . '" >' . $term->name.'</a>';
+			            echo '</td>';
+			            echo '<td>';
+			            echo $term->taxonomy;
+			            echo '</td>';
+			            echo '<tr>';
+			        }
+			    }
+			
+			    //now, display all the child categories
+			    foreach ($terms as $term) {
+			        if( $term->parent ){
+			            $output .= '<a href="' . esc_url( get_term_link( $term->term_id ) ) . '" title="' . esc_attr( sprintf( __( "View all posts in %s" ), $term->name ) ) . '" >' . $term->name.'</a>,';
+			        }
+			    }
+			
+			    echo '</table>';
+			}
+		}
 	}
 	
-	//TODO LOOP CATEGORIES
+// 	$taxonomies = get_taxonomies( $args, $output, $operator );
 	
-	$cat_args = array(
-	    'taxonomy' => 'category',
-	    'hide_empty' => true,
-	);
-	$terms = get_terms();
-	if( $terms ){
-	    $output = "";
-	
-	    //display all the top-level categories first
-	    foreach ($terms as $term) {
-	        if( !$term->parent ){
-	            echo '<tr>';
-	            echo '<td>';
-	            echo '<a href="' . esc_url( get_term_link( $term->term_id ) ) . '" title="' . esc_attr( sprintf( __( "View all posts in %s" ), $term->name ) ) . '" >' . $term->name.'</a>,';
-	            echo '</td>';
-	            echo '<tr>';
-	        }
-	    }
-	
-	    //now, display all the child categories
-	    foreach ($terms as $term) {
-	        if( $term->parent ){
-	            $output .= '<a href="' . esc_url( get_term_link( $term->term_id ) ) . '" title="' . esc_attr( sprintf( __( "View all posts in %s" ), $term->name ) ) . '" >' . $term->name.'</a>,';
-	        }
-	    }
-	
-	    echo trim( $output, "," );
-	}
 
 	
+/*
 	echo '<pre>';
 	var_dump($terms);
 	echo '</pre>';
+*/
 }
 
 
