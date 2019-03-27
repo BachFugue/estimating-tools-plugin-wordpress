@@ -157,19 +157,21 @@ function display_taxonomies(){
 		
 		foreach ( $taxonomies  as $taxonomy ) {
 		    echo '<h2>' . ucfirst ($taxonomy) . '</h2>';		
-			$cat_args = array(
+			$terms_args = array(
 			    'taxonomy' => $taxonomy,
 			    'hide_empty' => true,
+			    'orderby' => 'name',
+			    'order' => 'ASC',
 			);
-			$terms = get_terms($cat_args);
+			$terms = get_terms($terms_args);
 			if( $terms ){
 			    echo '<table id="scope">';
 			    echo '<tr>';
 			    echo '<th>';
-			    echo 'Name';
+			    echo 'Terms';
 			    echo '</th>';
 			    echo '<th>';
-			    echo 'Tax Type';
+			    echo 'Count';
 			    echo '</th>';
 				echo '</tr>';			
 			    //display all the top-level categories first
@@ -180,16 +182,32 @@ function display_taxonomies(){
 			            echo '<a href="' . esc_url( get_term_link( $term->term_id ) ) . '" title="' . esc_attr( sprintf( __( "View all posts in %s" ), $term->name ) ) . '" >' . $term->name.'</a>';
 			            echo '</td>';
 			            echo '<td>';
-			            echo $term->taxonomy;
+			            echo $term->count;
 			            echo '</td>';
 			            echo '<tr>';
-			        }
-			    }
-			
-			    //now, display all the child categories
-			    foreach ($terms as $term) {
-			        if( $term->parent ){
-			            $output .= '<a href="' . esc_url( get_term_link( $term->term_id ) ) . '" title="' . esc_attr( sprintf( __( "View all posts in %s" ), $term->name ) ) . '" >' . $term->name.'</a>,';
+			            
+			            $child_args = array(
+						    'taxonomy' => $taxonomy,
+						    'child_of' => $term->term_id,
+						    'hide_empty' => true,
+						    'orderby' => 'name',
+						    'order' => 'ASC',
+						);
+						$children = get_terms($child_args);
+						if( $children ){
+							foreach ($children as $child) {
+					            echo '<tr>';
+					            echo '<td style="padding-left:40px;">';
+// 					            echo '<div style="height:50px; width:50px; background: salmon; display: inline-block;" ></div>';
+					            echo '<a href="' . esc_url( get_term_link( $child->term_id ) ) . '" title="' . esc_attr( sprintf( __( "View all posts in %s" ), $child->name ) ) . '" >' . $child->name.'</a>';
+					            echo '</td>';
+					            echo '<td>';
+					            echo $child->count;
+					            echo '</td>';
+					            echo '<tr>';
+							}
+						}
+						
 			        }
 			    }
 			
@@ -211,11 +229,13 @@ function display_taxonomies(){
 		
 		foreach ( $taxonomies  as $taxonomy ) {
 		    echo '<h2>' . ucfirst ($taxonomy) . '</h2>';		
-			$cat_args = array(
+			$terms_args = array(
 			    'taxonomy' => $taxonomy,
 			    'hide_empty' => true,
+			    'orderby' => 'name',
+			    'order' => 'ASC',
 			);
-			$terms = get_terms($cat_args);
+			$terms = get_terms($terms_args);
 			if( $terms ){
 			    echo '<table id="scope">';
 			    echo '<tr>';
@@ -223,7 +243,7 @@ function display_taxonomies(){
 			    echo 'Name';
 			    echo '</th>';
 			    echo '<th>';
-			    echo 'Tax Type';
+			    echo 'Count';
 			    echo '</th>';
 				echo '</tr>';
 			
@@ -235,9 +255,31 @@ function display_taxonomies(){
 			            echo '<a href="' . esc_url( get_term_link( $term->term_id ) ) . '" title="' . esc_attr( sprintf( __( "View all posts in %s" ), $term->name ) ) . '" >' . $term->name.'</a>';
 			            echo '</td>';
 			            echo '<td>';
-			            echo $term->taxonomy;
+			            echo $term->count;
 			            echo '</td>';
 			            echo '<tr>';
+			         
+			         	$child_args = array(
+						    'taxonomy' => $taxonomy,
+						    'child_of' => $term->term_id,
+						    'hide_empty' => true,
+						    'orderby' => 'name',
+						    'order' => 'ASC',
+						);
+						$children = get_terms($child_args);
+						if( $children ){
+							foreach ($children as $child) {
+					            echo '<tr>';
+					            echo '<td style="padding-left:40px;">';
+					            echo '<a href="' . esc_url( get_term_link( $child->term_id ) ) . '" title="' . esc_attr( sprintf( __( "View all posts in %s" ), $child->name ) ) . '" >' . $child->name.'</a>';
+					            echo '</td>';
+					            echo '<td>';
+					            echo $child->count;
+					            echo '</td>';
+					            echo '<tr>';
+							}
+						}   
+			            
 			        }
 			    }
 			
